@@ -2,14 +2,13 @@
 using Android.Widget;
 using Android.OS;
 using Android.Views;
+using System.Collections.Generic;
 
 namespace Spider_Controller
 {
     [Activity(Label = "Spider Controller", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
-        ImageButton buttonForward, buttonBackward, buttonLeft, buttonRight;
-
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -17,19 +16,18 @@ namespace Spider_Controller
 
             // ToDo: create BluetoothAdapter and connect to spider
 
-            buttonForward = FindViewById<ImageButton>(Resource.Id.button_forward);
-            buttonBackward = FindViewById<ImageButton>(Resource.Id.button_backward);
-            buttonLeft = FindViewById<ImageButton>(Resource.Id.button_left);
-            buttonRight = FindViewById<ImageButton>(Resource.Id.button_right);
+            List<ImageButton> directionalPad = new List<ImageButton>();
+            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_forward));
+            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_backward));
+            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_left));
+            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_right));
 
             // Add custom touch listener to register when button is held down
             ButtonListener buttonListener = new ButtonListener();
             // ToDo: set buttonListener's btAdapter
-            buttonForward.SetOnTouchListener(buttonListener);
-            buttonBackward.SetOnTouchListener(buttonListener);
-            buttonLeft.SetOnTouchListener(buttonListener);
-            buttonRight.SetOnTouchListener(buttonListener);
-
+            foreach (var button in directionalPad) {
+                button.SetOnTouchListener(buttonListener);
+            }
         }
     }
 }
