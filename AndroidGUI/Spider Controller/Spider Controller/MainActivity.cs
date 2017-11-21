@@ -15,6 +15,8 @@ namespace Spider_Controller
             base.OnCreate(bundle);
             SetContentView (Resource.Layout.Main);
 
+            // ToDo: create BluetoothAdapter and connect to spider
+
             buttonForward = FindViewById<ImageButton>(Resource.Id.button_forward);
             buttonBackward = FindViewById<ImageButton>(Resource.Id.button_backward);
             buttonLeft = FindViewById<ImageButton>(Resource.Id.button_left);
@@ -22,6 +24,7 @@ namespace Spider_Controller
 
             // Add custom touch listener to register when button is held down
             ButtonListener buttonListener = new ButtonListener();
+            // ToDo: set buttonListener's btAdapter
             buttonForward.SetOnTouchListener(buttonListener);
             buttonBackward.SetOnTouchListener(buttonListener);
             buttonLeft.SetOnTouchListener(buttonListener);
