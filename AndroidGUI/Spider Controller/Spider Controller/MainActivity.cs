@@ -16,11 +16,13 @@ namespace Spider_Controller
 
             // ToDo: create BluetoothAdapter and connect to spider
 
-            List<ImageButton> directionalPad = new List<ImageButton>();
-            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_forward));
-            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_backward));
-            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_left));
-            directionalPad.Add(FindViewById<ImageButton>(Resource.Id.button_right));
+            List<ImageButton> directionalPad = new List<ImageButton>
+            {
+                FindViewById<ImageButton>(Resource.Id.button_forward),
+                FindViewById<ImageButton>(Resource.Id.button_backward),
+                FindViewById<ImageButton>(Resource.Id.button_left),
+                FindViewById<ImageButton>(Resource.Id.button_right)
+            };
 
             // Add custom touch listener to register when button is held down
             ButtonListener buttonListener = new ButtonListener();
