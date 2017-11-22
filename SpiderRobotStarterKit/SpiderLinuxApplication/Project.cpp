@@ -15,31 +15,38 @@
 
 int main(int argc, char *argv[]){
 
-  printf("===== Group <X> Final Project =====\r\n");
+    printf("===== Group H Final Project =====\r\n");
 
-  //####################################
-  /*
-    DO NOT TAKE THIS SECTION AWAY. SPIDER'S BEHAVIOR
-    IS NOT AS EXPECTED WITHOUT THIS INITIALIZATION STEP
-  */
-  //####################################
+    CSpider spider;
 
-  // Spider class
-  CSpider Spider;
+    printf("Spider initializing\r\n");
 
-	printf("Spider Init & Standup\r\n");
-	if (!Spider.Init()){
-		printf("Spilder Init failed\r\n");
-	}else{
-		if (!Spider.Standup())
-			printf("Spilder Standup failed\r\n");
-	}
-	Spider.SetSpeed(50);
+    if (!spider.Init())
+    {
+        printf("Spider failed to initialize.\r\n");
+    }
+    else
+    {
+        if (!spider.Standup())
+        {
+            printf("Spider failed to stand up.\r\n");
+        }
+    }
 
-  //####################################
+    spider.SetSpeed(50);
 
-  // Uncomment to use the ADC class for reading IR sensor
-  // ADC adc;
+    // IR Sensor
+    //ADC adc;
+
+    printf("Creating BlueTooth thread.");
+    int thread_ret = pthread_create(&id0,NULL,bluetooth_spp_thread, (void *)&QueueCommand);
+    if (thread_ret != 0)
+    {
+        printf("Failed to create pthread.");
+    }
+
+    printf("Listening for command...\r\n");
+    LED_PIO.SetLED(0x7f); //Indicate on spider
 
 
 	return 0;
