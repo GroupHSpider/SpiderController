@@ -13,6 +13,9 @@
 #include "PIO_BUTTON.h"
 #include "ADC.h"
 
+
+#define MAX_IDLE_TIME 600000
+
 typedef enum{
     CMD_AT,
     CMD_FORDWARD,
@@ -67,8 +70,10 @@ static void *bluetooth_spp_thread(void *ptr)
 int main(int argc, char *argv[]){
 
     CSpider spider;
-    CQueueCommand queue_command;
-
+    CQueueCommand command_queue;
+    int command, param;
+    uint32_t last_action;
+    bool asleep = false;
 
     printf("===== Group H Final Project =====\r\n");
 
@@ -100,11 +105,55 @@ int main(int argc, char *argv[]){
 
     printf("Listening for command...\r\n");
     LED_PIO.SetLED(0x7f); //Indicate on spider
-
+    last_action = OS_GetTickCount();
 
     while(true)
     {
+        if(!asleep && ((OS_GetTickCount()-last_action) > MAX_IDLE_TIME))
+        {
+            asleep = true;
+            last_action = OS_GetTickCount();
+            spider.Sleep();
+            LED_PIO.SetLED(0x1);
+        }
 
+        if (BUTTON_PIO.GetBUTTON() == 0x2)
+        {
+            if (asleep)
+            {
+                asleep = false;
+                spider.WakeUp();
+                LED_PIO.SetLED(0x7f);
+            }
+            spider.Reset();
+            last_action = OS_GetTickCount();
+        }
+        else if (BUTTON_PIO.GetBUTTON() == 0x1)
+        {
+            if (asleep)
+            {
+                asleep = false;
+                spider.WakeUp();
+                LED_PIO.SetLED(0x7f);
+            }
+            spider.DEMO_Dance(1);
+            last_action = OS_GetTickCount();
+        }
+
+        if (!command_queue.isEmpty() && command_queue.Pop(&command, &param))
+        {
+            if (asleep)
+            {
+                asleep = false;
+                spider.WakeUp();
+                LED_PIO.SetLED(0x7f);
+            }
+
+            switch(command)
+            {
+                default: printf("Nothing happens.");
+            }
+        }
     }
 
 
