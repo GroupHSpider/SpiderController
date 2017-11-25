@@ -38,42 +38,39 @@ static void *bluetooth_spp_thread(void *ptr)
 {
     CBtSppCommand BtSppCommand;
     CQueueCommand *pQueueCommand;
-    int Command, Param;
-    pQueueCommand = (CQueueCommand *)ptr;
-    printf("[BT]Start Service\r\n");
+    int command, param;
+
+    pQueueCommand = (CQueueCommand*)ptr;
+    printf("[BT] Start Service\r\n");
     BtSppCommand.RegisterService();
-    while(true){
-        printf("[BT]Lisen...\r\n");
+
+    while (true)
+    {
+        printf("[BT] Listening...\r\n");
         BtSppCommand.RfcommOpen();
-        printf("[BT]Connected...\r\n");
-        while(1){
-            Command = BtSppCommand.CommandPolling(&Param);
-            if (Command != CMD_IDLE){
-                // push command to command queue
-                if (Command == CMD_STOP)
+        printf("[BT] Connected.\r\n");
+        while (true)
+        {
+            command = BtSppCommand.CommandPolling(param);
+            if (command != CMD_IDLE)
+            {
+                if (command == CMD_STOP)
                     pQueueCommand->Clear();
-                // push command to command queue
-                if (!pQueueCommand->IsFull()){
-                    pQueueCommand->Push(Command, Param);
-                }
-                /*if (!pQueueCommand->IsFull()){
-                    pQueueCommand->Push(Command, Param);
-                }*/
+
+                if (!pQueueCommand->isFull())
+                    pQueueCommand->Push(command, param);
             }
         }
-        printf("[BT]Disconneected...\r\n");
-        BtSppCommand.RfcommClose();
     }
-
-//	pthread_exit(0); /* exit */
-    return 0;
 }
 
 int main(int argc, char *argv[]){
 
-    printf("===== Group H Final Project =====\r\n");
-
     CSpider spider;
+    CQueueCommand queue_command;
+
+
+    printf("===== Group H Final Project =====\r\n");
 
     printf("Spider initializing\r\n");
 
@@ -95,7 +92,7 @@ int main(int argc, char *argv[]){
     //ADC adc;
 
     printf("Creating BlueTooth thread.");
-    int thread_ret = pthread_create(&id0,NULL,bluetooth_spp_thread, (void *)&QueueCommand);
+    int thread_ret = pthread_create(&id0, NULL, bluetooth_spp_thread, (void *)&QueueCommand);
     if (thread_ret != 0)
     {
         printf("Failed to create pthread.");
@@ -103,6 +100,7 @@ int main(int argc, char *argv[]){
 
     printf("Listening for command...\r\n");
     LED_PIO.SetLED(0x7f); //Indicate on spider
+
 
     while(true)
     {
