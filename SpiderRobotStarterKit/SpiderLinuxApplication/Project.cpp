@@ -16,16 +16,17 @@
 
 #define MAX_IDLE_TIME 600000
 
+
 typedef enum{
     CMD_AT,
-    CMD_FORDWARD,
+    CMD_FORWARD,
     CMD_BACKWARD,
-    CMD_TURN_RIHGT,
+    CMD_TURN_RIGHT,
     CMD_TURN_LEFT,
-    CMD_TURN_RIHGT_DGREE,
-    CMD_TURN_LEFT_DGREE,
+    CMD_TURN_RIGHT_DEGREE,
+    CMD_TURN_LEFT_DEGREE,
     CMD_STOP,
-    CMD_SPPED,
+    CMD_SPEED,
     CMD_TILTL,
     CMD_TILTR,
     CMD_TILTF,
@@ -151,6 +152,11 @@ int main(int argc, char *argv[]){
 
             switch(command)
             {
+                case CMD_FORWARD:
+                    printf("FORWARD");
+                    spider.MoveForward(1);
+                    break;
+
                 default: printf("Nothing happens.");
             }
         }
