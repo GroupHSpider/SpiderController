@@ -5,7 +5,7 @@ using Android.Views;
 using System.Collections.Generic;
 using Android.Bluetooth;
 using Android.Content;
-
+using Android.Util;
 
 namespace Spider_Controller
 {
@@ -15,7 +15,6 @@ namespace Spider_Controller
         private const int REQUEST_CONNECT_DEVICE = 1;
         const int RequestEnableBt = 2;
         private BluetoothAdapter adaptor = null;
-        private Bluetooth
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -48,6 +47,15 @@ namespace Spider_Controller
                 button.SetOnTouchListener(buttonListener);
             }
         }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            var serverIntent = new Intent(this, typeof(DeviceListActivity));
+            StartActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+        }
+
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
 
@@ -79,8 +87,7 @@ namespace Spider_Controller
                     else
                     {
                         // User did not enable Bluetooth or an error occured
-                        Log.Debug(TAG, "BT not enabled");
-                        Toast.MakeText(this, Resource.String.bt_not_enabled_leaving, ToastLength.Short).Show();
+                        Toast.MakeText(this, "Bluetooth not enabled", ToastLength.Short).Show();
                         Finish();
                     }
                     break;

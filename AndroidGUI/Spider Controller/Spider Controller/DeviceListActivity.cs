@@ -35,7 +35,7 @@ namespace Spider_Controller
     [Activity(Label = "@string/select_device",
                 Theme = "@android:style/Theme.Dialog",
                 ConfigurationChanges = Android.Content.PM.ConfigChanges.KeyboardHidden | Android.Content.PM.ConfigChanges.Orientation)]
-    public class DeviceListActivity : Activity
+    internal class DeviceListActivity : Activity
     {
         // Debugging
         private const string TAG = "DeviceListActivity";
