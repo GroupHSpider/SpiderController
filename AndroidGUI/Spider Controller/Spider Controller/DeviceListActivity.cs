@@ -138,7 +138,9 @@ namespace Spider_Controller
                 Log.Debug(TAG, "doDiscovery()");
 
             // Indicate scanning in the title
+#pragma warning disable CS0618 // Type or member is obsolete
             SetProgressBarIndeterminateVisibility(true);
+#pragma warning restore CS0618 // Type or member is obsolete
             SetTitle(Resource.String.scanning);
 
             // Turn on sub-title for new devices

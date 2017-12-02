@@ -22,16 +22,16 @@ namespace Spider_Controller
             SetContentView (Resource.Layout.Main);
 
             //Getting bluetooth connection
-
-            if(adaptor == null)
-                Toast.MakeText(Application.Context, "No bluetooth device found", ToastLength.Short).Show();
-
-            if(!adaptor.IsEnabled) {
-                Intent enablebt = new Intent(BluetoothAdapter.ActionRequestEnable);
-                StartActivityForResult(enablebt, RequestEnableBt);
-            }
-            // ToDo: create BluetoothAdapter and connect to spider
             adaptor = BluetoothAdapter.DefaultAdapter;
+
+            if (adaptor == null)
+            {
+                Toast.MakeText(Application.Context, "Bluetooth is not available", ToastLength.Short).Show();
+                Finish();
+                return;
+            }
+            
+            // ToDo: create BluetoothAdapter and connect to spider
             List<ImageButton> directionalPad = new List<ImageButton>
             {
                 FindViewById<ImageButton>(Resource.Id.button_forward),
@@ -52,6 +52,12 @@ namespace Spider_Controller
         {
             base.OnStart();
 
+            if (!adaptor.IsEnabled)
+            {
+                Intent enablebt = new Intent(BluetoothAdapter.ActionRequestEnable);
+                StartActivityForResult(enablebt, RequestEnableBt);
+            }
+
             var serverIntent = new Intent(this, typeof(DeviceListActivity));
             StartActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
         }
@@ -71,7 +77,7 @@ namespace Spider_Controller
                         BluetoothDevice device = adaptor.GetRemoteDevice(address);
 
                         // Attempt to connect to the device
-                        chatService.Connect(device);
+                        // chatService.Connect(device);
 
                     }
                     break;
