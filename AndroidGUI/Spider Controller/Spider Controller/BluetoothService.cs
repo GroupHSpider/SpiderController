@@ -46,14 +46,14 @@ namespace Spider_Controller
     class BluetoothService
     {
         // Debugging
-        private const string TAG = "BluetoothService";
+        private const string TAG = "Terasic RFCOMM";
         private const bool Debug = true;
 
         // Name for the SDP record when creating server socket
-        private const string NAME = "BluetoothController";
+        private const string NAME = "Terasic RFCOMM";
 
         // Unique UUID for this application
-        private static UUID MY_UUID = UUID.FromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+        private static UUID MY_UUID = UUID.FromString("0000000000000000000000000000abcd");
 
         // Member fields
         protected BluetoothAdapter _adapter;
