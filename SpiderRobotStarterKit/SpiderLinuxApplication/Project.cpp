@@ -21,9 +21,9 @@ typedef enum{
     CMD_AT,
     CMD_FORWARD,
     CMD_BACKWARD,
-    CMD_TURN_RIGHT,
+    CMD_TURN_RIHGT,
     CMD_TURN_LEFT,
-    CMD_TURN_RIGHT_DEGREE,
+    CMD_TURN_RIHGT_DEGREE,
     CMD_TURN_LEFT_DEGREE,
     CMD_STOP,
     CMD_SPEED,
@@ -40,42 +40,79 @@ typedef enum{
 
 static void *bluetooth_spp_thread(void *ptr)
 {
-    CBtSppCommand BtSppCommand;
-    CQueueCommand *pQueueCommand;
-    int command, param;
 
-    pQueueCommand = (CQueueCommand*)ptr;
-    printf("[BT] Start Service\r\n");
-    BtSppCommand.RegisterService();
+	CBtSppCommand BtSppCommand;
+	CQueueCommand *pQueueCommand;
+	int Command, Param;
+	pQueueCommand = (CQueueCommand *)ptr;
+	printf("[BT]Start Service\r\n");
+	BtSppCommand.RegisterService();
+	while(1){
+		printf("[BT]Lisen...\r\n");
+		BtSppCommand.RfcommOpen();
+		printf("[BT]Connected...\r\n");
+		while(1){
+			Command = BtSppCommand.CommandPolling(&Param);
+			if (Command != CMD_IDLE){
+				// push command to command queue
+				if (Command == CMD_STOP)
+				   pQueueCommand->Clear();
+				// push command to command queue 
+				if (!pQueueCommand->IsFull()){
+				   pQueueCommand->Push(Command, Param);
+				    }
+				/*if (!pQueueCommand->IsFull()){
+					pQueueCommand->Push(Command, Param);
+				}*/
+			}
+		}
+		printf("[BT]Disconneected...\r\n");
+		BtSppCommand.RfcommClose();
+	}
 
-    while (true)
-    {
-        printf("[BT] Listening...\r\n");
-        BtSppCommand.RfcommOpen();
-        printf("[BT] Connected.\r\n");
-        while (true)
-        {
-            command = BtSppCommand.CommandPolling(param);
-            if (command != CMD_IDLE)
-            {
-                if (command == CMD_STOP)
-                    pQueueCommand->Clear();
-
-                if (!pQueueCommand->isFull())
-                    pQueueCommand->Push(command, param);
-            }
-        }
-    }
+//	pthread_exit(0); /* exit */
+	return 0;
 }
 
+bool get_lowest_reading(CSpider* spider, ADC *adc) {
+
+	spider->RotatelLeft(5);
+	uint32_t left = adc->GetChannel(0);
+	spider->RotatelRight(10);
+	uint32_t right = adc->GetChannel(0);
+	
+	return (right < left);
+}
+
+void forward_detection(CSpider* spider, ADC *adc) {
+	bool direction = false;
+	uint32_t sensorReading0 = 0;
+	sensorReading0 = adc->GetChannel(0);
+	printf("Ch0 Sensor Reading: %u\r\n", sensorReading0);
+	if (sensorReading0 >= 1200) {
+		printf("get direction");
+		direction = get_lowest_reading(spider, adc);
+		if (direction) {
+			//spider.RotatelRight(10);
+		} else {
+			spider->RotatelLeft(10);
+		}
+	} else {
+		printf("forward");
+		spider->MoveForward(1);
+	}
+}
 int main(int argc, char *argv[]){
 
     CSpider spider;
     CQueueCommand command_queue;
     int command, param;
     uint32_t last_action;
+	pthread_t bt_thread;
     bool asleep = false;
-
+	CPIO_LED LED_PIO;
+    CPIO_BUTTON BUTTON_PIO;
+	
     printf("===== Group H Final Project =====\r\n");
 
     printf("Spider initializing\r\n");
@@ -95,10 +132,10 @@ int main(int argc, char *argv[]){
     spider.SetSpeed(50);
 
     // IR Sensor
-    //ADC adc;
+    ADC adc;
 
     printf("Creating BlueTooth thread.");
-    int thread_ret = pthread_create(&id0, NULL, bluetooth_spp_thread, (void *)&QueueCommand);
+    int thread_ret = pthread_create(&bt_thread, NULL, bluetooth_spp_thread, (void *)&command_queue);
     if (thread_ret != 0)
     {
         printf("Failed to create pthread.");
@@ -110,6 +147,8 @@ int main(int argc, char *argv[]){
 
     while(true)
     {
+		//sensorReading0 = adc.GetChannel(0);
+		//printf("Ch0 Sensor Reading: %u\r\n", sensorReading0);
         if(!asleep && ((OS_GetTickCount()-last_action) > MAX_IDLE_TIME))
         {
             asleep = true;
@@ -137,11 +176,15 @@ int main(int argc, char *argv[]){
                 spider.WakeUp();
                 LED_PIO.SetLED(0x7f);
             }
-            spider.DEMO_Dance(1);
+			
+			while (true) {
+				forward_detection(&spider, &adc);
+			}
+		
             last_action = OS_GetTickCount();
         }
 
-        if (!command_queue.isEmpty() && command_queue.Pop(&command, &param))
+        if (!command_queue.IsEmpty() && command_queue.Pop(&command, &param))
         {
             if (asleep)
             {
@@ -154,9 +197,20 @@ int main(int argc, char *argv[]){
             {
                 case CMD_FORWARD:
                     printf("FORWARD");
-                    spider.MoveForward(1);
+                    forward_detection(&spider, &adc);
                     break;
-
+				case CMD_BACKWARD:
+					printf("CMD_BACKWARD\n");
+					spider.MoveBackward(1);
+					break;
+				case CMD_TURN_RIHGT:
+					printf("CMD_TURN_RIHGT\n");
+					spider.RotatelRight(1);
+					break;
+				case CMD_TURN_LEFT:
+					printf("CMD_TURN_LEFT\n");
+					spider.RotatelLeft(1);
+					break;
                 default: printf("Nothing happens.");
             }
         }
