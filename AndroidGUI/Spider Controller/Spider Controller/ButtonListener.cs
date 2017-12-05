@@ -15,7 +15,12 @@ namespace Spider_Controller
 {
     class ButtonListener : Java.Lang.Object, View.IOnTouchListener
     {
-        public BluetoothAdapter BtAdapter { get; set; }
+        private MainActivity mainActivity;
+
+        public ButtonListener(MainActivity mainActivity)
+        {
+            this.mainActivity = mainActivity;
+        }
 
         public bool OnTouch(View v, MotionEvent e)
         { 
@@ -25,10 +30,10 @@ namespace Spider_Controller
                     switch (e.Action)
                     {
                         case MotionEventActions.Down:
-                            Toast.MakeText(Application.Context, "forward", ToastLength.Short).Show();
+                            mainActivity.MovementState = "forward";
                             break;
                         case MotionEventActions.Up:
-                            Toast.MakeText(Application.Context, "stop", ToastLength.Short).Show();
+                            mainActivity.MovementState = "stop";
                             break;
                     }
                     break;
@@ -36,10 +41,10 @@ namespace Spider_Controller
                     switch (e.Action)
                     {
                         case MotionEventActions.Down:
-                            Toast.MakeText(Application.Context, "back", ToastLength.Short).Show();
+                            mainActivity.MovementState = "backward";
                             break;
                         case MotionEventActions.Up:
-                            Toast.MakeText(Application.Context, "stop", ToastLength.Short).Show();
+                            mainActivity.MovementState = "stop";
                             break;
                     }
                     break;
@@ -47,10 +52,10 @@ namespace Spider_Controller
                     switch (e.Action)
                     {
                         case MotionEventActions.Down:
-                            Toast.MakeText(Application.Context, "left", ToastLength.Short).Show();
+                            mainActivity.MovementState = "left";
                             break;
                         case MotionEventActions.Up:
-                            Toast.MakeText(Application.Context, "stop", ToastLength.Short).Show();
+                            mainActivity.MovementState = "stop";
                             break;
                     }
                     break;
@@ -58,17 +63,16 @@ namespace Spider_Controller
                     switch (e.Action)
                     {
                         case MotionEventActions.Down:
-                            Toast.MakeText(Application.Context, "right", ToastLength.Short).Show();
+                            mainActivity.MovementState = "right";
                             break;
                         case MotionEventActions.Up:
-                            Toast.MakeText(Application.Context, "stop", ToastLength.Short).Show();
+                            mainActivity.MovementState = "stop";
                             break;
                     }
                     break;
             }
             return true;
         }
-
-        // ToDo: make forward, back, left, right functions and hook them up to the bluetooth adapter
+        
     }
 }
