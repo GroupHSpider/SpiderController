@@ -78,6 +78,9 @@ bool get_lowest_reading(CSpider* spider, ADC *adc) {
 
 	spider->RotatelLeft(5);
 	uint32_t left = adc->GetChannel(0);
+	if (left < 500)
+		return true;
+	
 	spider->RotatelRight(10);
 	uint32_t right = adc->GetChannel(0);
 	
@@ -89,7 +92,7 @@ void forward_detection(CSpider* spider, ADC *adc) {
 	uint32_t sensorReading0 = 0;
 	sensorReading0 = adc->GetChannel(0);
 	printf("Ch0 Sensor Reading: %u\r\n", sensorReading0);
-	if (sensorReading0 >= 1200) {
+	if (sensorReading0 >= 900) {
 		printf("get direction");
 		direction = get_lowest_reading(spider, adc);
 		if (direction) {
@@ -211,8 +214,14 @@ int main(int argc, char *argv[]){
 					printf("CMD_TURN_LEFT\n");
 					spider.RotatelLeft(1);
 					break;
+				case CMD_STOP:
+					printf("CMD_STOP\n");
+					spider.Fold();
+					printf("SHUTTING_DOWN\n");
+					return 0;
+					break;
                 default: printf("Nothing happens.");
-            }
+            } 
         }
     }
 
